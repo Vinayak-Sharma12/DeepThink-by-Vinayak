@@ -26,7 +26,6 @@ Pre-implementation. The planning and specification are complete; coding starts a
 | `Expected_Outcome.md` | Per-phase artifacts, observable outcomes, and pass/fail gates |
 | `Time_Estimates.md` | Realistic schedule per phase |
 | `Sample_Answers.md` / `Model_Answers_50.md` | Golden behavioral target (the model's voice) |
-| `AGENTS.md` | Build rules for AI agents working in this repo |
 | `configs/constitution.md` | The 10 principles that define the character |
 | `configs/persona_system_prompt.txt` | Production system prompt encoding the constitution |
 

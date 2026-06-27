@@ -27,9 +27,14 @@ htmlcov/
 # IDE
 .idea/
 .vscode/
+.cursor/
 *.swp
 *.swo
 .DS_Store
+
+# Cursor / local agent workflow (kept locally, not published)
+AGENTS.md
+phases/
 
 # Project artifacts (generated at runtime)
 models/*
