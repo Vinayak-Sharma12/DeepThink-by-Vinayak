@@ -10,13 +10,11 @@ import torch
 
 from inference.generate import GenerationConfig
 from inference.generate import generate as run_generate
+from inference.loader import load_gpt_from_checkpoint
 from inference.sampler import SamplerConfig
 from model import GPT
 from tokenizer import Tokenizer
-from training.checkpoint import gpt_config_from_dict, load_checkpoint
 from training.device import resolve_device
-from training.optimizer import AdamWConfig, create_adamw
-from training.scheduler import CosineWarmupConfig, create_cosine_warmup_scheduler
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -42,24 +40,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def load_model_from_checkpoint(checkpoint_path: Path, device: torch.device) -> GPT:
     """Load a ``GPT`` model from a training checkpoint."""
-    payload = torch.load(checkpoint_path, map_location=device, weights_only=False)
-    config = gpt_config_from_dict(payload["gpt_config"])
-    model = GPT(config)
-    optimizer = create_adamw(model.parameters(), AdamWConfig())
-    scheduler = create_cosine_warmup_scheduler(
-        optimizer,
-        CosineWarmupConfig(warmup_steps=1, max_steps=2),
-    )
-    load_checkpoint(
-        checkpoint_path,
-        model=model,
-        optimizer=optimizer,
-        scheduler=scheduler,
-        map_location=device,
-    )
-    model.to(device)
-    model.eval()
-    return model
+    return load_gpt_from_checkpoint(checkpoint_path, device)
 
 
 def main(argv: list[str] | None = None) -> int:

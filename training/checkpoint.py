@@ -43,7 +43,12 @@ def restore_rng_state(state: RNGState) -> None:
     """Restore RNG state captured by ``capture_rng_state``."""
     random.setstate(state.python)
     np.random.set_state(state.numpy)
-    torch.set_rng_state(state.torch_rng)
+    torch_rng = state.torch_rng
+    if not isinstance(torch_rng, torch.Tensor):
+        torch_rng = torch.as_tensor(torch_rng, dtype=torch.uint8)
+    else:
+        torch_rng = torch_rng.detach().cpu().to(torch.uint8)
+    torch.set_rng_state(torch_rng)
     if state.torch_cuda is not None and torch.cuda.is_available():
         torch.cuda.set_rng_state_all(state.torch_cuda)
 

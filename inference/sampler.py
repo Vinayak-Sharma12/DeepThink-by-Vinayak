@@ -55,6 +55,18 @@ def apply_top_p(logits: torch.Tensor, top_p: float) -> torch.Tensor:
     return filtered.scatter(-1, sorted_indices, sorted_logits)
 
 
+def make_generator(device: torch.device, seed: int) -> torch.Generator | None:
+    """Return a device-matched generator for reproducible sampling."""
+    if seed <= 0:
+        return None
+    torch.manual_seed(seed)
+    if device.type in ("cpu", "cuda", "mps"):
+        generator = torch.Generator(device=device.type)
+        generator.manual_seed(seed)
+        return generator
+    return None
+
+
 def sample_token(
     logits: torch.Tensor,
     config: SamplerConfig,

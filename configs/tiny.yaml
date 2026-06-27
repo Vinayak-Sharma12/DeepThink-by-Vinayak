@@ -1,0 +1,52 @@
+# Tiny (~10M) GPT on Tiny Shakespeare — Phase 7
+experiment:
+  name: tiny_shakespeare
+  output_dir: experiments
+
+model:
+  n_layer: 6
+  n_head: 6
+  d_model: 384
+  ctx_len: 512
+  dropout: 0.1
+  # vocab_size is set from tokenizer.vocab_size after BPE training
+
+data:
+  data_dir: data/shakespeare
+  val_split: 0.1
+  seed: 42
+
+tokenizer:
+  vocab_size: 4096
+  train: true
+
+training:
+  max_steps: 1500
+  batch_size: 16
+  grad_accum_steps: 2
+  learning_rate: 3.0e-4
+  weight_decay: 0.05
+  warmup_steps: 100
+  max_grad_norm: 1.0
+  eval_interval: 50
+  log_interval: 10
+  seed: 42
+  prefer_bf16: true
+  device: null
+
+checkpoint:
+  save_interval: 500
+
+evaluation:
+  val_perplexity_target: 35.0
+  early_stop: true
+  eval_patience_steps: 200
+
+sampling:
+  prompts:
+    - "First Citizen:\nBefore we proceed any further, hear me speak."
+    - "ROMEO:\n"
+    - "KING HENRY VI:\n"
+  max_new_tokens: 120
+  temperatures: [0.0, 0.7, 1.0]
+  seed: 42

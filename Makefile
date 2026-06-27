@@ -22,7 +22,7 @@ coverage:
 	pytest tests/ --cov --cov-report=term-missing
 
 train:
-	@echo "Not implemented — see phases/05_phase5_training_framework.md"
+	$(PYTHON) scripts/train.py --config $(or $(CONFIG),configs/tiny.yaml)
 
 generate:
 	$(PYTHON) scripts/generate.py $(ARGS)
@@ -31,4 +31,4 @@ serve:
 	@echo "Not implemented — see phases/17_phase13_inference_api.md"
 
 app:
-	@echo "Not implemented — see phases/18_phase14_chat_app.md"
+	streamlit run app/playground.py $(ARGS)

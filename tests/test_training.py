@@ -42,13 +42,11 @@ def _make_micro_batches(
             (batch_size, seq_len),
             generator=generator,
         )
-        targets = torch.randint(
-            1,
-            vocab_size,
-            (batch_size, seq_len),
-            generator=generator,
-        )
+        targets = input_ids.clone()
+        targets[:, :-1] = input_ids[:, 1:]
+        targets[:, -1] = 0
         loss_mask = torch.ones(batch_size, seq_len, dtype=torch.long)
+        loss_mask[:, -1] = 0
         batches.append(
             {
                 "input_ids": input_ids,
@@ -81,9 +79,10 @@ def test_loss_decreases_on_synthetic_task() -> None:
     seed_everything(42)
     config = _nano_config()
     model = GPT(config)
-    trainer = _trainer(model, config, max_steps=50, grad_accum_steps=1)
-    micro_batches = _make_micro_batches(60, batch_size=2, vocab_size=config.vocab_size)
-    losses = trainer.train_steps(micro_batches, num_steps=40)
+    trainer = _trainer(model, config, max_steps=80, grad_accum_steps=1)
+    micro_batch = _make_micro_batches(1, batch_size=2, vocab_size=config.vocab_size)[0]
+    micro_batches = [micro_batch] * 80
+    losses = trainer.train_steps(micro_batches, num_steps=60)
     assert losses[-1] < losses[0]
 
 

@@ -70,6 +70,16 @@ def estimate_parameter_count(config: GPTConfig) -> int:
     return embed + lm_head + config.n_layer * per_layer + d_model
 
 
+def _init_weights(module: nn.Module) -> None:
+    """GPT-2-style init: small normal weights for stable early training."""
+    if isinstance(module, nn.Linear):
+        torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+        if module.bias is not None:
+            torch.nn.init.zeros_(module.bias)
+    elif isinstance(module, nn.Embedding):
+        torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+
+
 class GPT(nn.Module):
     """Decoder-only GPT with RoPE, RMSNorm, SwiGLU, GQA, and KV cache."""
 
@@ -84,6 +94,7 @@ class GPT(nn.Module):
             self.lm_head = nn.Linear(config.d_model, config.vocab_size, bias=False)
         else:
             self.lm_head = None
+        self.apply(_init_weights)
 
     def forward(
         self,

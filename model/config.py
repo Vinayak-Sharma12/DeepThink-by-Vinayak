@@ -60,3 +60,14 @@ class GPTConfig:
             d_model=128,
             ctx_len=256,
         )
+
+    @classmethod
+    def tiny(cls, vocab_size: int = 4096) -> GPTConfig:
+        """Tiny (~10M) config for Shakespeare pretraining (Phase 7)."""
+        return cls(
+            vocab_size=vocab_size,
+            n_layer=6,
+            n_head=6,
+            d_model=384,
+            ctx_len=512,
+        )
