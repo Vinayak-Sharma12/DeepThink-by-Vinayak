@@ -1,0 +1,112 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logos"
+version = "0.1.0"
+description = "DeepThink by Vinayak — GPT-style language model built from scratch (codename LOGOS)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "TBD" }
+authors = [{ name = "Vinayak" }]
+dependencies = [
+    "torch==2.12.1",
+    "numpy==2.5.0",
+    "pytest==9.1.1",
+    "pytest-cov==7.1.0",
+    "fastapi==0.138.1",
+    "uvicorn==0.49.0",
+    "streamlit==1.58.0",
+    "PyYAML==6.0.3",
+    "tqdm==4.68.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff==0.15.20",
+    "mypy==2.1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "app*",
+    "configs*",
+    "data*",
+    "datasets*",
+    "docs*",
+    "evaluation*",
+    "experiments*",
+    "inference*",
+    "logs*",
+    "model*",
+    "models*",
+    "scripts*",
+    "tokenizer*",
+    "training*",
+]
+exclude = ["tests*"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["."]
+extend-exclude = [".venv", "build", "dist"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "W"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+exclude = ["(?x)(^\\.venv/|build/|dist/)"]
+packages = [
+    "app",
+    "configs",
+    "data",
+    "datasets",
+    "evaluation",
+    "experiments",
+    "inference",
+    "logs",
+    "model",
+    "models",
+    "scripts",
+    "tokenizer",
+    "training",
+]
+
+[[tool.mypy.overrides]]
+module = ["torch.*", "numpy.*", "fastapi.*", "streamlit.*", "uvicorn.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-v --strict-markers"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+[tool.coverage.run]
+source = [
+    "app",
+    "datasets",
+    "evaluation",
+    "inference",
+    "model",
+    "tokenizer",
+    "training",
+]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
