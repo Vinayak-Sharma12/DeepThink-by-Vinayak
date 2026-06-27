@@ -25,7 +25,7 @@ train:
 	@echo "Not implemented — see phases/05_phase5_training_framework.md"
 
 generate:
-	@echo "Not implemented — see phases/06_phase6_text_generation.md"
+	$(PYTHON) scripts/generate.py $(ARGS)
 
 serve:
 	@echo "Not implemented — see phases/17_phase13_inference_api.md"
