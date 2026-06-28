@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 import torch
@@ -15,6 +16,7 @@ class SamplerConfig:
     temperature: float = 1.0
     top_k: int | None = None
     top_p: float | None = None
+    repetition_penalty: float = 1.0
 
     def __post_init__(self) -> None:
         if self.temperature < 0.0:
@@ -25,6 +27,9 @@ class SamplerConfig:
             raise ValueError(msg)
         if self.top_p is not None and not 0.0 < self.top_p <= 1.0:
             msg = f"top_p must be in (0, 1], got {self.top_p}"
+            raise ValueError(msg)
+        if self.repetition_penalty <= 0.0:
+            msg = f"repetition_penalty must be positive, got {self.repetition_penalty}"
             raise ValueError(msg)
 
 
@@ -42,6 +47,28 @@ def apply_top_k(logits: torch.Tensor, top_k: int) -> torch.Tensor:
     top_values, _ = torch.topk(logits, k)
     threshold = top_values[..., -1, None]
     return logits.masked_fill(logits < threshold, float("-inf"))
+
+
+def apply_repetition_penalty(
+    logits: torch.Tensor,
+    prev_token_ids: Sequence[int],
+    penalty: float,
+) -> torch.Tensor:
+    """Down-weight logits for tokens already present in ``prev_token_ids``."""
+    if penalty == 1.0 or not prev_token_ids:
+        return logits
+
+    adjusted = logits.clone()
+    vocab = adjusted.shape[-1]
+    for token_id in set(prev_token_ids):
+        if token_id < 0 or token_id >= vocab:
+            continue
+        score = adjusted[token_id]
+        if score > 0:
+            adjusted[token_id] = score / penalty
+        else:
+            adjusted[token_id] = score * penalty
+    return adjusted
 
 
 def apply_top_p(logits: torch.Tensor, top_p: float) -> torch.Tensor:
@@ -72,16 +99,24 @@ def sample_token(
     config: SamplerConfig,
     *,
     generator: torch.Generator | None = None,
+    prev_token_ids: Sequence[int] | None = None,
 ) -> int:
     """Sample one token id from ``logits`` ``[vocab]`` using ``config``."""
     if logits.ndim != 1:
         msg = f"Expected 1-D logits, got shape {tuple(logits.shape)}"
         raise ValueError(msg)
 
-    if config.temperature == 0.0 and config.top_k is None and config.top_p is None:
+    history = list(prev_token_ids or [])
+    if (
+        config.temperature == 0.0
+        and config.top_k is None
+        and config.top_p is None
+        and config.repetition_penalty == 1.0
+    ):
         return int(torch.argmax(logits).item())
 
-    processed = apply_temperature(logits, config.temperature)
+    processed = apply_repetition_penalty(logits, history, config.repetition_penalty)
+    processed = apply_temperature(processed, config.temperature)
     if config.top_k is not None:
         processed = apply_top_k(processed, config.top_k)
     if config.top_p is not None:

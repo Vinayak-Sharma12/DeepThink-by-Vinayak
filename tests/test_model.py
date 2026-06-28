@@ -149,6 +149,13 @@ def test_kv_cache_logits_parity() -> None:
     assert torch.allclose(logits_no_cache, logits_cached, atol=1e-5, rtol=1e-4)
 
 
+def test_small_config_parameter_count() -> None:
+    """Small tier sits in the ~30–50M range for Phase 8."""
+    config = GPTConfig.small(vocab_size=8192)
+    params = count_parameters(GPT(config))
+    assert 25_000_000 <= params <= 55_000_000
+
+
 def test_count_parameters_matches_estimate() -> None:
     """Parameter counter matches a hand-derived total."""
     config = GPTConfig(

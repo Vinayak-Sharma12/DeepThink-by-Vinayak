@@ -9,7 +9,7 @@ import torch
 
 import inference.generate as generate_module
 from inference.generate import GenerationConfig, apply_thinking_mode
-from inference.sampler import SamplerConfig, apply_top_k, sample_token
+from inference.sampler import SamplerConfig, apply_repetition_penalty, apply_top_k, sample_token
 from model import GPT, GPTConfig
 from tokenizer import Tokenizer
 
@@ -133,6 +133,29 @@ def test_greedy_sampling_is_argmax() -> None:
     """Greedy sampling picks the argmax logit."""
     logits = torch.tensor([0.1, 2.0, 1.0])
     token_id = sample_token(logits, SamplerConfig(temperature=0.0))
+    assert token_id == 1
+
+
+def test_repetition_penalty_is_noop_at_one() -> None:
+    """Repetition penalty 1.0 leaves logits unchanged."""
+    logits = torch.tensor([1.0, 2.0, 3.0])
+    adjusted = apply_repetition_penalty(logits, [0, 2], 1.0)
+    assert torch.equal(adjusted, logits)
+
+
+def test_repetition_penalty_downweights_seen_token() -> None:
+    """Seen tokens are down-weighted when penalty exceeds 1."""
+    logits = torch.tensor([1.0, 2.0, 3.0])
+    adjusted = apply_repetition_penalty(logits, [2], 2.0)
+    assert adjusted[2].item() == pytest.approx(1.5)
+    assert adjusted[0].item() == pytest.approx(1.0)
+    assert adjusted[1].item() == pytest.approx(2.0)
+
+    token_id = sample_token(
+        logits,
+        SamplerConfig(temperature=0.0, repetition_penalty=2.0),
+        prev_token_ids=[2],
+    )
     assert token_id == 1
 
 

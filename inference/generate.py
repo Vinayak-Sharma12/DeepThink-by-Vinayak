@@ -159,7 +159,12 @@ def _generate_with_cache(
     start_pos = len(prompt_ids)
 
     for offset in range(max_new_tokens):
-        token_id = sample_token(next_logits, sampler, generator=generator)
+        token_id = sample_token(
+            next_logits,
+            sampler,
+            generator=generator,
+            prev_token_ids=prompt_ids + generated,
+        )
         if stop_on_eos and token_id == eos_id:
             break
         generated.append(token_id)
@@ -193,7 +198,12 @@ def _generate_without_cache(
         input_tensor = torch.tensor([sequence], dtype=torch.long, device=device)
         logits = model(input_tensor)
         next_logits = logits[0, -1, :]
-        token_id = sample_token(next_logits, sampler, generator=generator)
+        token_id = sample_token(
+            next_logits,
+            sampler,
+            generator=generator,
+            prev_token_ids=sequence,
+        )
         if stop_on_eos and token_id == eos_id:
             break
         generated.append(token_id)

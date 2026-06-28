@@ -71,3 +71,14 @@ class GPTConfig:
             d_model=384,
             ctx_len=512,
         )
+
+    @classmethod
+    def small(cls, vocab_size: int = 8192) -> GPTConfig:
+        """Small (~30–50M) config for general pretraining (Phase 8)."""
+        return cls(
+            vocab_size=vocab_size,
+            n_layer=8,
+            n_head=8,
+            d_model=512,
+            ctx_len=1024,
+        )

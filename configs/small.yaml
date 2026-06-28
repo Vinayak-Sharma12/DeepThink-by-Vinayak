@@ -1,0 +1,70 @@
+# Small (~30–50M) GPT general pretraining — Phase 8
+experiment:
+  name: general_pretrain_small
+  output_dir: experiments
+
+model:
+  n_layer: 8
+  n_head: 8
+  d_model: 512
+  ctx_len: 1024
+  dropout: 0.1
+
+data:
+  pipeline: general
+  data_dir: data/general
+  ctx_len: 1024
+  mix:
+    wikitext_weight: 5.0
+    tinystories_weight: 1.0
+    openwebtext_weight: 1.0
+    wikitext_train_max: 100000
+    tinystories_train_max: 50000
+    tinystories_val_max: 2000
+    openwebtext_train_max: 10000
+    openwebtext_val_max: 1000
+    shard_size: 512
+    seed: 42
+
+tokenizer:
+  vocab_size: 8192
+  train: true
+  sample_max_chars: 8000000
+
+training:
+  max_steps: 2500
+  batch_size: 2
+  grad_accum_steps: 16
+  learning_rate: 2.5e-4
+  weight_decay: 0.1
+  warmup_steps: 200
+  max_grad_norm: 1.0
+  eval_interval: 100
+  log_interval: 20
+  seed: 42
+  prefer_bf16: true
+  device: null
+
+checkpoint:
+  save_interval: 250
+
+evaluation:
+  val_perplexity_target: 40.0
+  early_stop: false
+  eval_patience_steps: 400
+  factual_probes_path: evaluation/data/factual_probes.json
+
+sampling:
+  prompts:
+    - "The capital of France is"
+    - "Water boils at"
+    - "Photosynthesis is the process by which"
+    - "The Pacific Ocean is the"
+    - "Einstein is best known for"
+  max_new_tokens: 80
+  fair_eval_max_new_tokens: 48
+  temperatures: [0.0, 0.7]
+  fair_eval_temperature: 0.7
+  top_p: 0.9
+  repetition_penalty: 1.3
+  seed: 42

@@ -6,7 +6,7 @@ import argparse
 import logging
 import math
 import sys
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +20,25 @@ if str(ROOT) not in sys.path:
 
 from datasets.collate import make_collate_fn
 from datasets.dataset import PretrainDataset
+from datasets.shards import ShardPretrainDataset
 from datasets.shakespeare import load_split_texts, prepare_shakespeare_splits
+from datasets.sources.general import (
+    PreparedCorpus,
+    build_mix_config,
+    iter_source_documents,
+    load_openwebtext_documents,
+    load_tinystories_documents,
+    load_wikitext_documents,
+    prepare_general_shards,
+    tokenizer_training_corpus,
+    weighted_train_documents,
+)
+from evaluation.factual_probes import (
+    load_probes,
+    score_factual_probes,
+    verify_in_corpus,
+    write_probe_results,
+)
 from inference.generate import GenerationConfig, generate
 from inference.sampler import SamplerConfig
 from model.config import GPTConfig
@@ -86,14 +104,26 @@ def build_gpt_config(model_section: dict[str, Any], vocab_size: int) -> GPTConfi
     )
 
 
+def build_sampler_config(sampling_section: dict[str, Any], *, temperature: float) -> SamplerConfig:
+    """Build ``SamplerConfig`` from YAML sampling settings."""
+    top_k = sampling_section.get("top_k")
+    top_p = sampling_section.get("top_p")
+    return SamplerConfig(
+        temperature=temperature,
+        top_k=int(top_k) if top_k is not None else None,
+        top_p=float(top_p) if top_p is not None else None,
+        repetition_penalty=float(sampling_section.get("repetition_penalty", 1.0)),
+    )
+
+
 def train_or_load_tokenizer(
     config: dict[str, Any],
-    train_text: str,
+    corpus: str | Iterable[str],
     tokenizer_dir: Path,
     *,
     shared_dir: Path | None = None,
 ) -> Tokenizer:
-    """Train a tokenizer on ``train_text`` or load an existing one."""
+    """Train a tokenizer on ``corpus`` or load an existing one."""
     tokenizer_section = _require_section(config, "tokenizer")
     vocab_size = int(tokenizer_section["vocab_size"])
     should_train = bool(tokenizer_section.get("train", True))
@@ -111,7 +141,8 @@ def train_or_load_tokenizer(
     tokenizer = Tokenizer()
     if should_train:
         logger.info("Training BPE tokenizer (vocab_size=%d)", vocab_size)
-        tokenizer.train([train_text], vocab_size=vocab_size)
+        corpus_iter = [corpus] if isinstance(corpus, str) else list(corpus)
+        tokenizer.train(corpus_iter, vocab_size=vocab_size)
         tokenizer.save(str(tokenizer_dir))
         if shared_dir is not None:
             tokenizer.save(str(shared_dir))
@@ -121,8 +152,80 @@ def train_or_load_tokenizer(
     raise RuntimeError(msg)
 
 
+def bootstrap_general_tokenizer_corpus(
+    data_dir: Path,
+    mix: CorpusMixConfig,
+    *,
+    max_chars: int,
+) -> str:
+    """Build a bounded mixed corpus string for BPE training."""
+    wiki_train, _ = load_wikitext_documents(data_dir, train_max=mix.wikitext_train_max)
+    bootstrap_mix = CorpusMixConfig(
+        wikitext_weight=mix.wikitext_weight,
+        tinystories_weight=mix.tinystories_weight,
+        openwebtext_weight=mix.openwebtext_weight,
+        tinystories_train_max=min(mix.tinystories_train_max, 5_000),
+        tinystories_val_max=0,
+        openwebtext_train_max=min(mix.openwebtext_train_max, 2_000),
+        openwebtext_val_max=0,
+        shard_size=mix.shard_size,
+        seed=mix.seed,
+    )
+    ts_train, _ = load_tinystories_documents(bootstrap_mix, data_dir=data_dir)
+    owt_train, _ = load_openwebtext_documents(bootstrap_mix, data_dir=data_dir)
+    mixed = weighted_train_documents(
+        wikitext=wiki_train,
+        tinystories=ts_train,
+        openwebtext=owt_train,
+        mix=bootstrap_mix,
+    )
+    return tokenizer_training_corpus(mixed, max_chars=max_chars)
+
+
+def setup_general_datasets(
+    config: dict[str, Any],
+    run_dir: Path,
+    *,
+    seed: int,
+) -> tuple[ShardPretrainDataset, ShardPretrainDataset, Tokenizer, Path, PreparedCorpus, int]:
+    """Prepare general-corpus shard datasets and tokenizer."""
+    data_section = _require_section(config, "data")
+    model_section = _require_section(config, "model")
+    tokenizer_section = _require_section(config, "tokenizer")
+
+    data_dir = ROOT / data_section.get("data_dir", "data/general")
+    ctx_len = int(data_section.get("ctx_len", model_section.get("ctx_len", 1024)))
+    mix = build_mix_config(data_section)
+    mix = CorpusMixConfig(**{**mix.__dict__, "seed": seed})
+
+    shared_tokenizer_dir = data_dir / "tokenizer"
+    tokenizer_dir = run_dir / "tokenizer"
+    sample_max_chars = int(tokenizer_section.get("sample_max_chars", 8_000_000))
+    corpus_text = bootstrap_general_tokenizer_corpus(
+        data_dir,
+        mix,
+        max_chars=sample_max_chars,
+    )
+    tokenizer = train_or_load_tokenizer(
+        config,
+        corpus_text,
+        tokenizer_dir,
+        shared_dir=shared_tokenizer_dir,
+    )
+
+    prepared = prepare_general_shards(data_dir, tokenizer, ctx_len, mix)
+    train_dataset = ShardPretrainDataset(prepared.train_shard_dir, tokenizer, seed=seed)
+    val_dataset = ShardPretrainDataset(prepared.val_shard_dir, tokenizer, seed=seed + 1)
+    logger.info(
+        "General shards — train sequences: %d | val sequences: %d",
+        prepared.train_sequences,
+        prepared.val_sequences,
+    )
+    return train_dataset, val_dataset, tokenizer, tokenizer_dir, prepared, ctx_len
+
+
 def build_dataloader(
-    dataset: PretrainDataset,
+    dataset: PretrainDataset | ShardPretrainDataset,
     *,
     batch_size: int,
     shuffle: bool,
@@ -145,7 +248,7 @@ def iter_batches(loader: DataLoader[dict[str, list[int]]]) -> Iterator[dict[str,
 
 
 def collect_eval_batches(
-    dataset: PretrainDataset,
+    dataset: PretrainDataset | ShardPretrainDataset,
     *,
     batch_size: int,
 ) -> list[dict[str, torch.Tensor]]:
@@ -175,6 +278,7 @@ def run_sampling(
     max_new_tokens: int,
     device: torch.device,
     seed: int,
+    sampling_section: dict[str, Any],
 ) -> list[dict[str, Any]]:
     """Generate samples at multiple temperatures."""
     was_training = model.training
@@ -183,13 +287,14 @@ def run_sampling(
     for prompt in prompts:
         for temperature in temperatures:
             torch.manual_seed(seed)
+            sampler = build_sampler_config(sampling_section, temperature=temperature)
             result = generate(
                 model,
                 tokenizer,
                 prompt,
                 GenerationConfig(
                     max_new_tokens=max_new_tokens,
-                    sampler=SamplerConfig(temperature=temperature),
+                    sampler=sampler,
                     add_bos=False,
                 ),
                 device=device,
@@ -228,23 +333,42 @@ def train_from_config(config_path: Path, *, resume: Path | None = None) -> Path:
     final_weights_path = run_dir / f"{experiment_name}.pt"
     logger.info("Experiment directory: %s", run_dir)
 
-    data_dir = ROOT / data_section.get("data_dir", "data/shakespeare")
-    val_split = float(data_section.get("val_split", 0.1))
-    prepare_shakespeare_splits(data_dir, val_ratio=val_split)
-    train_text, val_text = load_split_texts(data_dir)
-
-    shared_tokenizer_dir = data_dir / "tokenizer"
+    pipeline = str(data_section.get("pipeline", "shakespeare"))
     tokenizer_dir = run_dir / "tokenizer"
-    tokenizer = train_or_load_tokenizer(
-        config,
-        train_text,
-        tokenizer_dir,
-        shared_dir=shared_tokenizer_dir,
-    )
-    ctx_len = int(model_section.get("ctx_len", 512))
+    memorization_corpus = ""
+    corpus_meta: dict[str, Any] = {}
 
-    train_dataset = PretrainDataset([train_text], tokenizer, ctx_len, seed=seed)
-    val_dataset = PretrainDataset([val_text], tokenizer, ctx_len, seed=seed + 1)
+    if pipeline == "general":
+        train_dataset, val_dataset, tokenizer, tokenizer_dir, prepared, ctx_len = setup_general_datasets(
+            config,
+            run_dir,
+            seed=seed,
+        )
+        corpus_meta = {
+            "pipeline": pipeline,
+            "train_sequences": prepared.train_sequences,
+            "val_sequences": prepared.val_sequences,
+            "train_documents": prepared.train_documents,
+            "val_documents": prepared.val_documents,
+        }
+    else:
+        data_dir = ROOT / data_section.get("data_dir", "data/shakespeare")
+        val_split = float(data_section.get("val_split", 0.1))
+        prepare_shakespeare_splits(data_dir, val_ratio=val_split)
+        train_text, val_text = load_split_texts(data_dir)
+        shared_tokenizer_dir = data_dir / "tokenizer"
+        tokenizer = train_or_load_tokenizer(
+            config,
+            train_text,
+            tokenizer_dir,
+            shared_dir=shared_tokenizer_dir,
+        )
+        ctx_len = int(model_section.get("ctx_len", 512))
+        train_dataset = PretrainDataset([train_text], tokenizer, ctx_len, seed=seed)
+        val_dataset = PretrainDataset([val_text], tokenizer, ctx_len, seed=seed + 1)
+        memorization_corpus = train_text
+        corpus_meta = {"pipeline": pipeline}
+
     logger.info("Train sequences: %d | Val sequences: %d", len(train_dataset), len(val_dataset))
 
     gpt_config = build_gpt_config(model_section, tokenizer.vocab_size)
@@ -407,13 +531,63 @@ def train_from_config(config_path: Path, *, resume: Path | None = None) -> Path:
         max_new_tokens=int(sampling_section.get("max_new_tokens", 120)),
         device=trainer.device,
         seed=int(sampling_section.get("seed", seed)),
+        sampling_section=sampling_section,
     )
     write_samples(run_dir / "samples.txt", sample_outputs)
+    if pipeline == "general":
+        write_samples(run_dir / "factual_samples.txt", sample_outputs)
 
     memorization_flags = [
-        is_verbatim_memorization(entry["text"], train_text)
+        is_verbatim_memorization(entry["text"], memorization_corpus)
         for entry in sample_outputs
-    ]
+    ] if memorization_corpus else [False] * len(sample_outputs)
+
+    factual_probe_metrics: dict[str, Any] = {}
+    if pipeline == "general":
+        probe_path = ROOT / str(
+            eval_section.get("factual_probes_path", "evaluation/data/factual_probes.json")
+        )
+        probes = load_probes(probe_path)
+        data_dir = ROOT / str(data_section.get("data_dir", "data/general"))
+        mix = build_mix_config(data_section)
+        documents = list(iter_source_documents(data_dir, mix))
+        verified, dropped = verify_in_corpus(probes, documents)
+        logger.info(
+            "Factual probes — kept %d, dropped %d not found in corpus",
+            len(verified),
+            len(dropped),
+        )
+        fair_sampler = build_sampler_config(
+            sampling_section,
+            temperature=float(sampling_section.get("fair_eval_temperature", 0.7)),
+        )
+        fair_max_new = int(
+            sampling_section.get(
+                "fair_eval_max_new_tokens",
+                sampling_section.get("max_new_tokens", 48),
+            )
+        )
+        probe_results = score_factual_probes(
+            model,
+            tokenizer,
+            verified,
+            sampler=fair_sampler,
+            device=trainer.device,
+            max_new_tokens=fair_max_new,
+            seed=int(sampling_section.get("seed", seed)),
+        )
+        write_probe_results(run_dir / "factual_probes.json", probe_results)
+        factual_probe_metrics = {
+            "factual_probe_hit_rate": probe_results["hit_rate"],
+            "factual_probe_hits": probe_results["hits"],
+            "factual_probe_total": probe_results["total"],
+        }
+        logger.info(
+            "Factual probe hit-rate: %d/%d (%.1f%%)",
+            probe_results["hits"],
+            probe_results["total"],
+            probe_results["hit_rate"] * 100.0,
+        )
 
     metrics = {
         "experiment": experiment_section.get("name", "run"),
@@ -428,10 +602,12 @@ def train_from_config(config_path: Path, *, resume: Path | None = None) -> Path:
         "parameter_count": count_parameters(model),
         "train_sequences": len(train_dataset),
         "val_sequences": len(val_dataset),
+        **corpus_meta,
         "memorization_spot_check": {
             "any_verbatim_long_span": any(memorization_flags),
             "per_sample": memorization_flags,
         },
+        **factual_probe_metrics,
     }
     write_metrics(run_dir / "metrics.json", metrics)
     logger.info(

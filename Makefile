@@ -21,8 +21,14 @@ format:
 coverage:
 	pytest tests/ --cov --cov-report=term-missing
 
+prepare-general:
+	$(PYTHON) scripts/prepare_general.py --config $(or $(CONFIG),configs/small.yaml)
+
 train:
 	$(PYTHON) scripts/train.py --config $(or $(CONFIG),configs/tiny.yaml)
+
+train-small:
+	$(PYTHON) scripts/train.py --config configs/small.yaml
 
 generate:
 	$(PYTHON) scripts/generate.py $(ARGS)
