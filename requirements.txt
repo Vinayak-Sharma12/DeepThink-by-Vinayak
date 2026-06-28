@@ -11,3 +11,6 @@ PyYAML==6.0.3
 tqdm==4.68.3
 # Parquet ingest for WikiText-103 (Phase 8 general pretraining).
 pyarrow==21.0.0
+# EPUB/PDF ingest for Phase 9 philosophy corpus (licensed owner files).
+pypdf==6.5.0
+ebooklib==0.19

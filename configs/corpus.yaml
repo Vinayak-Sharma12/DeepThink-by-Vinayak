@@ -1,0 +1,44 @@
+# LOGOS philosophy corpus configuration (Phase 9).
+
+chunk:
+  target_tokens: 512
+  min_tokens: 64
+  max_tokens: 1024
+  overlap_tokens: 0
+
+dedup:
+  near_dup_threshold: 0.92
+  phase8_overlap_threshold: 0.85
+  simhash_bits: 64
+
+holdout:
+  bible_books: ["Ecclesiastes", "Romans"]
+  quran_surahs: [55, 56, 67]
+  gita_chapters: [13, 14, 15]
+  ggs_ang_ranges: [[500, 550]]
+
+mix_buckets:
+  scripture: 0.22
+  theist_philosophy: 0.18
+  atheist_secular: 0.18
+  buddhism: 0.14
+  ethics_logic_psych: 0.12
+  indian_multi: 0.08
+  other: 0.08
+
+mix_tolerance: 0.05
+mix_min_tokens: 500000
+
+metadata:
+  required_coverage: 0.95
+
+paths:
+  train_jsonl: data/logos/train.jsonl
+  holdout_dir: data/logos/holdout
+  fallacies_jsonl: data/logos/fallacies.jsonl
+  biases_jsonl: data/logos/biases.jsonl
+  cache_dir: data/logos/cache
+  general_shards_dir: data/general/shards
+  audit_report: docs/corpus_audit.md
+  source_registry: configs/source_registry.yaml
+  topic_registry: configs/topic_registry.yaml

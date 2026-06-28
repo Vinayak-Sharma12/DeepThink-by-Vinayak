@@ -1,0 +1,671 @@
+# Maps source_id → default metadata for LOGOS corpus ingest.
+# File paths are relative to repo root.
+
+sources:
+  # --- PD classics (fetched) ---
+  hume_dialogues_1779:
+    title: "Dialogues Concerning Natural Religion"
+    author: "David Hume"
+    year: 1779
+    language: en
+    religion: none
+    tradition: skepticism
+    school: empiricism
+    topic: [existence_of_god, faith_vs_evidence, design_argument]
+    stance: argues_against
+    source_type: book
+    license: PD-US
+    mix_bucket: atheist_secular
+
+  hume_enquiry_1748:
+    title: "An Enquiry Concerning Human Understanding"
+    author: "David Hume"
+    year: 1748
+    language: en
+    religion: none
+    tradition: skepticism
+    school: empiricism
+    topic: [faith_vs_evidence, epistemology, miracles]
+    stance: argues_against
+    source_type: book
+    license: PD-US
+    mix_bucket: atheist_secular
+
+  mackie_evil_1955:
+    title: "Evil and Omnipotence"
+    author: "J. L. Mackie"
+    year: 1955
+    language: en
+    religion: none
+    tradition: atheism
+    school: analytic_philosophy
+    topic: [problem_of_evil, logic]
+    stance: argues_against
+    source_type: essay
+    license: PD-US
+    mix_bucket: atheist_secular
+
+  aquinas_summa_god:
+    title: "Summa Theologica (Prima Pars: God)"
+    author: "Thomas Aquinas"
+    year: 1274
+    language: en
+    religion: christian
+    tradition: christian
+    school: scholastic
+    topic: [existence_of_god, divine_command, revelation_vs_reason]
+    stance: argues_for
+    source_type: book
+    license: PD-US
+    mix_bucket: theist_philosophy
+
+  paley_natural_theology_1802:
+    title: "Natural Theology"
+    author: "William Paley"
+    year: 1802
+    language: en
+    religion: christian
+    tradition: christian
+    school: natural_theology
+    topic: [design_argument, existence_of_god]
+    stance: argues_for
+    source_type: book
+    license: PD-US
+    mix_bucket: theist_philosophy
+
+  plato_euthyphro:
+    title: "Euthyphro"
+    author: "Plato"
+    year: -399
+    language: en
+    religion: none
+    tradition: platonism
+    school: platonism
+    topic: [divine_command, morality_without_god]
+    stance: survey
+    source_type: book
+    license: PD-US
+    mix_bucket: ethics_logic_psych
+
+  aristotle_nicomachean:
+    title: "Nicomachean Ethics"
+    author: "Aristotle"
+    year: -350
+    language: en
+    religion: none
+    tradition: virtue_ethics
+    school: virtue_ethics
+    topic: [virtue_ethics, morality]
+    stance: survey
+    source_type: book
+    license: PD-US
+    mix_bucket: ethics_logic_psych
+
+  mill_utilitarianism_1863:
+    title: "Utilitarianism"
+    author: "John Stuart Mill"
+    year: 1863
+    language: en
+    religion: none
+    tradition: secular_humanism
+    school: utilitarian
+    topic: [utilitarianism, morality]
+    stance: argues_for
+    source_type: book
+    license: PD-US
+    mix_bucket: ethics_logic_psych
+
+  kant_groundwork:
+    title: "Groundwork of the Metaphysics of Morals"
+    author: "Immanuel Kant"
+    year: 1785
+    language: en
+    religion: none
+    tradition: deontology
+    school: deontology
+    topic: [deontology, morality]
+    stance: argues_for
+    source_type: book
+    license: PD-US
+    mix_bucket: ethics_logic_psych
+
+  upanishads_muller:
+    title: "The Upanishads"
+    author: "Various"
+    year: 1879
+    language: en
+    religion: hindu
+    tradition: hindu
+    school: vedanta
+    topic: [soul, existence_of_god, meaning]
+    stance: primary_source
+    source_type: book
+    license: PD-US
+    translation: "F. Max Müller"
+    mix_bucket: theist_philosophy
+
+  jain_tattvartha:
+    title: "Tattvārtha Sūtra"
+    author: "Umasvati"
+    year: 200
+    language: en
+    religion: jain
+    tradition: jain
+    school: jain
+    topic: [epistemology, soul, rebirth]
+    stance: primary_source
+    source_type: book
+    license: PD-US
+    mix_bucket: indian_multi
+
+  maimonides_guide:
+    title: "Guide for the Perplexed"
+    author: "Maimonides"
+    year: 1190
+    language: en
+    religion: jewish
+    tradition: jewish
+    school: medieval_philosophy
+    topic: [existence_of_god, revelation_vs_reason]
+    stance: argues_for
+    source_type: book
+    license: PD-US
+    mix_bucket: indian_multi
+
+  dhammapada:
+    title: "Dhammapada"
+    author: "Buddha"
+    year: -300
+    language: en
+    religion: buddhist
+    tradition: buddhist
+    school: theravada
+    topic: [morality, suffering, mind]
+    stance: primary_source
+    source_type: scripture
+    license: PD-US
+    mix_bucket: buddhism
+
+  sutta_anatta:
+    title: "Anattā-lakkhana Sutta"
+    author: "Buddha"
+    year: -500
+    language: en
+    religion: buddhist
+    tradition: buddhist
+    school: theravada
+    topic: [no_self, soul]
+    stance: primary_source
+    source_type: scripture
+    license: PD-US
+    mix_bucket: buddhism
+
+  sutta_brahmajala:
+    title: "Brahmajala Sutta"
+    author: "Buddha"
+    year: -500
+    language: en
+    religion: buddhist
+    tradition: buddhist
+    school: theravada
+    topic: [existence_of_god, survey]
+    stance: primary_source
+    source_type: scripture
+    license: PD-US
+    mix_bucket: buddhism
+
+  nagarjuna_madhyamaka:
+    title: "Mūlamadhyamakakārikā"
+    author: "Nāgārjuna"
+    year: 200
+    language: en
+    religion: buddhist
+    tradition: buddhist
+    school: tibetan
+    topic: [emptiness, logic, existence_of_god, suffering, no_self]
+    stance: primary_source
+    source_type: book
+    license: PD-US
+    mix_bucket: buddhism
+
+  shantideva_bodhicaryavatara:
+    title: "Bodhicaryāvatāra"
+    author: "Shantideva"
+    year: 700
+    language: en
+    religion: buddhist
+    tradition: buddhist
+    school: tibetan
+    topic: [morality, compassion, no_self, suffering]
+    stance: primary_source
+    source_type: book
+    license: PD-US
+    mix_bucket: buddhism
+
+  mumonkan:
+    title: "Mumonkan (Gateless Gate)"
+    author: "Mumon"
+    year: 1228
+    language: en
+    religion: buddhist
+    tradition: buddhist
+    school: zen
+    topic: [logic, meaning, critique_of_eternalism, suffering, no_self]
+    stance: primary_source
+    source_type: book
+    license: PD-US
+    mix_bucket: buddhism
+
+  bible_kjv:
+    title: "Bible (King James Version)"
+    author: "Various"
+    year: 1769
+    language: en
+    religion: christian
+    tradition: christian
+    school: null
+    topic: [existence_of_god, morality, soul, revelation]
+    stance: primary_source
+    source_type: scripture
+    license: PD-US
+    translation: "King James Version"
+    mix_bucket: scripture
+
+  quran_rodwell:
+    title: "Qur'an (Rodwell translation)"
+    author: "Muhammad"
+    year: 1861
+    language: en
+    religion: islam
+    tradition: islamic
+    school: null
+    topic: [existence_of_god, morality, revelation, soul]
+    stance: primary_source
+    source_type: scripture
+    license: PD-US
+    translation: "J. M. Rodwell"
+    mix_bucket: scripture
+
+  gita_ttd_2023:
+    title: "Bhagavad Gita"
+    author: "Vyasa"
+    year: 2023
+    language: en
+    religion: hindu
+    tradition: hindu
+    school: dvaita
+    topic: [existence_of_god, soul, morality, devotion]
+    stance: primary_source
+    source_type: scripture
+    license: licensed
+    translation: "TTD 2023 (Raghavendra Gita Vivruti line)"
+    file: data/raw/scriptures/bhagavad_gita_ttd_raghavendra_2023.pdf
+    mix_bucket: scripture
+
+  ggs_sant_singh_khalsa:
+    title: "Siri Guru Granth Sahib"
+    author: "Guru Nanak et al."
+    year: 2020
+    language: en
+    religion: sikh
+    tradition: sikh
+    school: null
+    topic: [existence_of_god, devotion, morality, soul]
+    stance: primary_source
+    source_type: scripture
+    license: licensed
+    translation: "Dr. Sant Singh Khalsa"
+    file: data/raw/scriptures/guru_granth_sahib_sant_singh_khalsa_en.pdf
+    mix_bucket: scripture
+
+  # --- Licensed atheist ---
+  dawkins_god_delusion:
+    title: "The God Delusion"
+    author: "Richard Dawkins"
+    year: 2006
+    language: en
+    religion: none
+    tradition: atheism
+    school: popular_atheism
+    topic: [existence_of_god, religion_and_science, faith_vs_evidence]
+    stance: argues_against
+    source_type: book
+    license: licensed
+    file: data/raw/atheist/dawkins_the_god_delusion.epub
+    mix_bucket: atheist_secular
+
+  dawkins_blind_watchmaker:
+    title: "The Blind Watchmaker"
+    author: "Richard Dawkins"
+    year: 1986
+    language: en
+    religion: none
+    tradition: atheism
+    school: popular_atheism
+    topic: [design_argument, religion_and_science, evolution]
+    stance: argues_against
+    source_type: book
+    license: licensed
+    file: data/raw/atheist/dawkins_blind_watchmaker.epub
+    mix_bucket: atheist_secular
+
+  hitchens_god_not_great:
+    title: "God Is Not Great"
+    author: "Christopher Hitchens"
+    year: 2007
+    language: en
+    religion: none
+    tradition: atheism
+    school: popular_atheism
+    topic: [critique_of_religion, religion_and_politics]
+    stance: argues_against
+    source_type: book
+    license: licensed
+    file: data/raw/atheist/hitchens_god_is_not_great.pdf
+    mix_bucket: atheist_secular
+
+  hitchens_portable_atheist:
+    title: "The Portable Atheist"
+    author: "Christopher Hitchens"
+    year: 2007
+    language: en
+    religion: none
+    tradition: atheism
+    school: popular_atheism
+    topic: [existence_of_god, faith_vs_evidence, morality_without_god, survey]
+    stance: survey
+    source_type: book
+    license: licensed
+    file: data/raw/atheist/hitchens_portable_atheist.epub
+    mix_bucket: atheist_secular
+
+  harris_end_of_faith:
+    title: "The End of Faith"
+    author: "Sam Harris"
+    year: 2004
+    language: en
+    religion: none
+    tradition: atheism
+    school: popular_atheism
+    topic: [faith_vs_evidence, religion_and_violence, morality_without_god]
+    stance: argues_against
+    source_type: book
+    license: licensed
+    file: data/raw/atheist/harris_the_end_of_faith.epub
+    mix_bucket: atheist_secular
+
+  harris_letter_christian_nation:
+    title: "Letter to a Christian Nation"
+    author: "Sam Harris"
+    year: 2006
+    language: en
+    religion: none
+    tradition: atheism
+    school: popular_atheism
+    topic: [existence_of_god, faith_vs_evidence]
+    stance: argues_against
+    source_type: book
+    license: licensed
+    file: data/raw/atheist/harris_letter_to_a_christian_nation.pdf
+    mix_bucket: atheist_secular
+
+  dennett_breaking_spell:
+    title: "Breaking the Spell"
+    author: "Daniel Dennett"
+    year: 2006
+    language: en
+    religion: none
+    tradition: naturalism
+    school: analytic_philosophy
+    topic: [religion_as_phenomenon, religion_and_science, naturalism]
+    stance: survey
+    source_type: book
+    license: licensed
+    file: data/raw/atheist/dennett_breaking_the_spell.pdf
+    mix_bucket: atheist_secular
+
+  smith_case_against_god:
+    title: "Atheism: The Case Against God"
+    author: "George H. Smith"
+    year: 1974
+    language: en
+    religion: none
+    tradition: atheism
+    school: analytic_philosophy
+    topic: [existence_of_god, faith_vs_evidence, logic]
+    stance: argues_against
+    source_type: book
+    license: licensed
+    file: data/raw/atheist/smith_atheism_case_against_god.pdf
+    mix_bucket: atheist_secular
+
+  boghossian_manual_atheists:
+    title: "A Manual for Creating Atheists"
+    author: "Peter Boghossian"
+    year: 2013
+    language: en
+    religion: none
+    tradition: atheism
+    school: street_epistemology
+    topic: [faith_vs_evidence, epistemology]
+    stance: argues_against
+    source_type: book
+    license: licensed
+    file: data/raw/atheist/boghossian_manual_creating_atheists.epub
+    mix_bucket: atheist_secular
+
+  # --- Licensed theist ---
+  plantinga_gfe:
+    title: "God, Freedom, and Evil"
+    author: "Alvin Plantinga"
+    year: 1974
+    language: en
+    religion: christian
+    tradition: christian
+    school: analytic_philosophy
+    topic: [problem_of_evil, free_will, existence_of_god]
+    stance: argues_for
+    source_type: book
+    license: licensed
+    file: data/raw/theist/plantinga_god_freedom_and_evil.epub
+    mix_bucket: theist_philosophy
+
+  ghazali_incoherence:
+    title: "The Incoherence of the Philosophers"
+    author: "al-Ghazali"
+    year: 1095
+    language: en
+    religion: islam
+    tradition: islamic
+    school: islamic_philosophy
+    topic: [revelation_vs_reason, faith_vs_evidence]
+    stance: argues_for
+    source_type: book
+    license: licensed
+    file: data/raw/theist/ghazali_incoherence_of_the_philosophers.pdf
+    mix_bucket: theist_philosophy
+
+  ibn_rushd_incoherence2:
+    title: "The Incoherence of the Incoherence"
+    author: "Ibn Rushd"
+    year: 1190
+    language: en
+    religion: islam
+    tradition: islamic
+    school: islamic_philosophy
+    topic: [faith_vs_evidence, revelation_vs_reason]
+    stance: argues_for
+    source_type: book
+    license: licensed
+    file: data/raw/theist/ibn_rushd_incoherence_of_the_incoherence.pdf
+    mix_bucket: theist_philosophy
+
+  # --- Osho ---
+  osho_god_is_dead:
+    title: "God Is Dead: Now Zen Is the Only Living Truth"
+    author: "Osho"
+    year: 1990
+    language: en
+    religion: none
+    tradition: critique_of_religion
+    school: zen
+    topic: [existence_of_god, faith_vs_evidence, critique_of_religion]
+    stance: argues_against
+    source_type: book
+    license: licensed
+    file: data/raw/osho/osho_god_is_dead_zen_only_living_truth.pdf
+    mix_bucket: other
+
+  osho_the_rebel:
+    title: "The Rebel"
+    author: "Osho"
+    year: 1987
+    language: en
+    religion: none
+    tradition: critique_of_religion
+    school: postmodern_spirituality
+    topic: [authority, critique_of_religion, faith_vs_evidence]
+    stance: argues_against
+    source_type: book
+    license: licensed
+    file: data/raw/osho/osho_the_rebel.epub
+    mix_bucket: other
+
+  osho_book_understanding:
+    title: "The Book of Understanding"
+    author: "Osho"
+    year: 2005
+    language: en
+    religion: none
+    tradition: critique_of_religion
+    school: mysticism
+    topic: [meaning, critique_of_religion]
+    stance: survey
+    source_type: book
+    license: licensed
+    file: data/raw/osho/osho_book_of_understanding.epub
+    mix_bucket: other
+
+  # --- Buddhism licensed ---
+  rahula_what_buddha_taught:
+    title: "What the Buddha Taught"
+    author: "Walpola Rahula"
+    year: 1959
+    language: en
+    religion: buddhist
+    tradition: buddhist
+    school: theravada
+    topic: [no_self, suffering, survey]
+    stance: survey
+    source_type: book
+    license: licensed
+    file: data/raw/buddhism/rahula_what_the_buddha_taught.pdf
+    mix_bucket: buddhism
+
+  suzuki_zen_mind:
+    title: "Zen Mind, Beginner's Mind"
+    author: "Shunryu Suzuki"
+    year: 1970
+    language: en
+    religion: buddhist
+    tradition: buddhist
+    school: zen
+    topic: [meditation, ethics, meaning, suffering, no_self, morality]
+    stance: survey
+    source_type: book
+    license: licensed
+    file: data/raw/buddhism/suzuki_zen_mind_beginners_mind.epub
+    mix_bucket: buddhism
+
+  dalai_lama_ethics:
+    title: "Ethics for the New Millennium"
+    author: "Dalai Lama XIV"
+    year: 1999
+    language: en
+    religion: buddhist
+    tradition: buddhist
+    school: tibetan
+    topic: [morality_without_god, compassion, morality, suffering, no_self]
+    stance: argues_for
+    source_type: book
+    license: licensed
+    file: data/raw/buddhism/dalai_lama_ethics_for_the_new_millennium.epub
+    mix_bucket: buddhism
+
+  # --- Indian voices ---
+  bhagat_singh_wiaa:
+    title: "Why I Am an Atheist"
+    author: "Bhagat Singh"
+    year: 1930
+    language: en
+    religion: none
+    tradition: atheism
+    school: indian_secularism
+    topic: [existence_of_god, faith_vs_evidence, critique_of_religion, religion_and_politics]
+    stance: argues_against
+    source_type: essay
+    license: licensed
+    file: data/raw/indian/bhagat_singh_why_i_am_an_atheist.pdf
+    mix_bucket: indian_multi
+
+  gandhi_my_religion:
+    title: "My Religion"
+    author: "Gandhi"
+    year: 1955
+    language: en
+    religion: hindu
+    tradition: hindu
+    school: hindu
+    topic: [faith_vs_evidence, morality, devotion]
+    stance: argues_for
+    source_type: book
+    license: licensed
+    file: data/raw/indian/gandhi_my_religion.pdf
+    mix_bucket: indian_multi
+
+  # --- Transcripts ---
+  debate_akhtar_nadwi:
+    title: "Does God Exist?"
+    author: "Javed Akhtar"
+    year: 2024
+    language: en
+    religion: none
+    tradition: atheism
+    school: indian_secularism
+    topic: [existence_of_god, faith_vs_evidence, problem_of_evil, morality_without_god]
+    stance: argues_against
+    source_type: debate_transcript
+    license: licensed
+    file: data/raw/transcripts/akhtar_nadwi_does_god_exist_en.txt
+    mix_bucket: indian_multi
+
+  prashant_debate_critique:
+    title: "Debating Religion and God — Q&A"
+    author: "Acharya Prashant"
+    year: 2025
+    language: en
+    original_language: hi
+    religion: hindu
+    tradition: hindu
+    school: advaita
+    topic: [existence_of_god, no_self, soul, critique_of_religion]
+    stance: argues_against
+    source_type: dialogue_qa
+    license: licensed
+    file: data/raw/transcripts/prashant_debate_critique_en.txt
+    mix_bucket: indian_multi
+
+  oconnor_bigthink:
+    title: "Strongest Arguments for and Against God"
+    author: "Alex O'Connor"
+    year: 2024
+    language: en
+    religion: none
+    tradition: atheism
+    school: analytic_philosophy
+    topic: [existence_of_god, problem_of_evil, nihilism, meaning, morality_without_god]
+    stance: survey
+    source_type: interview
+    license: licensed
+    file: data/raw/transcripts/oconnor_bigthink_god_arguments_en.txt
+    mix_bucket: atheist_secular

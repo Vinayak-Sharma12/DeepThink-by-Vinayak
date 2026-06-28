@@ -1,0 +1,48 @@
+# Controlled topic vocabulary for LOGOS corpus (Phase 9).
+# Extend only via PR + test update.
+
+topics:
+  - existence_of_god
+  - problem_of_evil
+  - morality_without_god
+  - divine_command
+  - meaning
+  - nihilism
+  - soul
+  - no_self
+  - rebirth
+  - faith_vs_evidence
+  - revelation_vs_reason
+  - religion_and_science
+  - design_argument
+  - religion_and_politics
+  - religion_and_violence
+  - free_will
+  - epistemology
+  - logic
+  - fallacy
+  - virtue_ethics
+  - utilitarianism
+  - deontology
+  - suffering
+  - emptiness
+  - critique_of_religion
+  - social_critique
+  - meditation
+  - mind
+  - middle_way
+  - devotion
+  - revelation
+  - morality
+  - miracles
+  - ethics
+  - compassion
+  - authority
+  - non_duality
+  - critique_of_eternalism
+  - evolution
+  - religion_as_phenomenon
+  - naturalism
+  - critique_of_organized_religion
+  - comparative_religion
+  - survey
